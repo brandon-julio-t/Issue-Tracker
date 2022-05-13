@@ -1,4 +1,5 @@
 const { uniqueID } = require("mocha/lib/utils");
+const Issue = require("../entities/issue");
 const Project = require("../entities/project");
 
 class Database {
@@ -6,10 +7,38 @@ class Database {
     projects: [],
     issues: [],
   };
-  
+
   static {
-    this._db.projects.push(
-      new Project(uniqueID(), 'apitest')
+    const project = new Project(uniqueID(), "apitest");
+    this._db.projects.push(project);
+    this._db.issues.push(
+      new Issue(
+        uniqueID(),
+        "title 1",
+        "text 1",
+        new Date(),
+        new Date(),
+        "dummy user",
+        project._id
+      ),
+      new Issue(
+        uniqueID(),
+        "title 2",
+        "text 2",
+        new Date(),
+        new Date(),
+        "dummy user",
+        project._id
+      ),
+      new Issue(
+        uniqueID(),
+        "title 3",
+        "text 3",
+        new Date(),
+        new Date(),
+        "dummy user",
+        project._id
+      )
     );
   }
 
