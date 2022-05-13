@@ -29,8 +29,11 @@ class CreateIssueUseCase {
       project = this.projectRepository.save(newProject);
     }
 
-    const issue = this.issueFactory.create(this.issueData);
-    return this.issueRepository.save(project, issue);
+    const issue = this.issueFactory.create({
+      ...this.issueData,
+      project_id: project._id,
+    });
+    return this.issueRepository.save(issue);
   }
 }
 

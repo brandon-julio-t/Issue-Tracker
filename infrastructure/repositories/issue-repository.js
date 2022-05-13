@@ -6,15 +6,25 @@ class IssueRepository {
     this.table = db.getIssuesTable();
   }
 
-  findAllByFilterFunction(project, filterFn) {
+  findOneById(id) {
+    return this.table.find((issue) => issue._id === id);
+  }
+
+  findAllByProjectAndFilterFunction(project, filterFn) {
     return this.table
       .filter((issue) => issue.project_id === project._id)
       .filter(filterFn);
   }
 
-  save(project, issue) {
-    issue.project_id = project._id;
+  save(issue) {
     this.table.push(issue);
+    return issue;
+  }
+
+  update(issue) {
+    const idx = this.table.findIndex(x => x._id === issue._id);
+    if (idx === -1) return null;
+    this.table[idx] = issue;
     return issue;
   }
 }

@@ -13,7 +13,7 @@ class GetIssuesUseCase {
     const project = this.projectRepository.findOneByName(this.projectName);
 
     const issues = project
-      ? this.issueRepository.findAllByFilterFunction(project, (issue) => {
+      ? this.issueRepository.findAllByProjectAndFilterFunction(project, (issue) => {
           const filterEntries = Object.entries(this.filters);
 
           if (filterEntries.length === 0) {
