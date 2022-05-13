@@ -156,7 +156,7 @@ suite("Functional Tests", function () {
         .send(issueData)
         .end((err, res) => {
           const issue = res.body;
-          issue.issue_text = "Hello, World!";
+          issue.issue_title = "Hello, World!";
 
           chai
             .request(server)
@@ -165,8 +165,26 @@ suite("Functional Tests", function () {
             .end((err, res) => {
               assert.strictEqual(res.status, 200);
               assert.isObject(res.body);
-              assert.deepNestedInclude(res.body, issue);
-              assert.strictEqual(res.body.issue_text, "Hello, World!");
+              assert.deepNestedInclude(res.body, {
+                result: "successfully updated",
+                _id: issue._id,
+              });
+
+              chai
+                .request(server)
+                .get(url)
+                .query({ _id: issue._id })
+                .end((err, res) => {
+                  assert.strictEqual(res.status, 200);
+                  assert.isArray(res.body);
+                  assert.strictEqual(res.body.length, 1);
+                  const newIssue = res.body[0];
+                  assert.strictEqual(newIssue.issue_title, issue.issue_title);
+                  assert.isAbove(
+                    Date.parse(newIssue.updated_on),
+                    Date.parse(issue.updated_on)
+                  );
+                });
             });
         });
     });
@@ -189,10 +207,28 @@ suite("Functional Tests", function () {
             .end((err, res) => {
               assert.strictEqual(res.status, 200);
               assert.isObject(res.body);
-              assert.deepNestedInclude(res.body, issue);
-              assert.strictEqual(res.body.issue_title, "Hello, World!");
-              assert.strictEqual(res.body.issue_text, "Hello, World!");
-              assert.strictEqual(res.body.created_by, "Hello, World!");
+              assert.deepNestedInclude(res.body, {
+                result: "successfully updated",
+                _id: issue._id,
+              });
+
+              chai
+                .request(server)
+                .get(url)
+                .query({ _id: issue._id })
+                .end((err, res) => {
+                  assert.strictEqual(res.status, 200);
+                  assert.isArray(res.body);
+                  assert.strictEqual(res.body.length, 1);
+                  const newIssue = res.body[0];
+                  assert.strictEqual(newIssue.issue_title, issue.issue_title);
+                  assert.strictEqual(newIssue.issue_text, issue.issue_text);
+                  assert.strictEqual(newIssue.created_by, issue.created_by);
+                  assert.isAbove(
+                    Date.parse(newIssue.updated_on),
+                    Date.parse(issue.updated_on)
+                  );
+                });
             });
         });
     });

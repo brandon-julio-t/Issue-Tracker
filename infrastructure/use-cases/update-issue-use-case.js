@@ -15,13 +15,15 @@ class UpdateIssueUseCase {
 
   execute() {
     const project = this.projectRepository.findOneByName(this.projectName);
-    
+
     this.validation.validate(project, this.issueData);
-    
+
     const issue = this.issueRepository.findOneById(this.issueData._id);
     Object.assign(issue, this.issueData);
+    issue.updated_on = new Date();
 
-    return this.issueRepository.update(issue);
+    this.issueRepository.update(issue);
+    return { result: "successfully updated", _id: issue._id };
   }
 }
 
