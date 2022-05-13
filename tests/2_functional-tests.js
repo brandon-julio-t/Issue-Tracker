@@ -83,8 +83,60 @@ suite("Functional Tests", function () {
   });
 
   suite("GET", () => {
-    test('View issues on a project: GET request to /api/issues/{project}', () => {
-      
+    test("View issues on a project: GET request to /api/issues/{project}", () => {
+      chai
+        .request(server)
+        .get(url)
+        .end((err, res) => {
+          assert.strictEqual(res.status, 200);
+          assert.isArray(res.body);
+          assert.strictEqual(
+            res.body.length,
+            5,
+            "There are three dummy data and two created data from previous tests."
+          );
+        });
+    });
+
+    test("View issues on a project with one filter: GET request to /api/issues/{project}", () => {
+      chai
+        .request(server)
+        .get(`${url}?${new URLSearchParams({ issue_title: "title 1" })}`)
+        .end((err, res) => {
+          assert.strictEqual(res.status, 200);
+          assert.isArray(res.body);
+          assert.strictEqual(res.body.length, 1);
+          assert.strictEqual(res.body[0].issue_title, "title 1");
+        });
+
+      chai
+        .request(server)
+        .get(`${url}?${new URLSearchParams({ created_by: "dummy user" })}`)
+        .end((err, res) => {
+          assert.strictEqual(res.status, 200);
+          assert.isArray(res.body);
+          assert.strictEqual(res.body.length, 3);
+          res.body.forEach((issue) =>
+            assert.strictEqual(issue.created_by, "dummy user")
+          );
+        });
+    });
+
+    test("View issues on a project with multiple filters: GET request to /api/issues/{project}", () => {
+      const filters = {
+        issue_title: "title 1",
+        issue_text: "text 1",
+      };
+
+      chai
+        .request(server)
+        .get(`${url}?${new URLSearchParams(filters)}`)
+        .end((err, res) => {
+          assert.strictEqual(res.status, 200);
+          assert.isArray(res.body);
+          assert.strictEqual(res.body.length, 1);
+          assert.deepNestedInclude(res.body[0], filters);
+        });
     });
   });
 });
