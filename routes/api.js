@@ -1,6 +1,7 @@
 "use strict";
 
 const CreateIssueUseCase = require("../infrastructure/use-cases/create-issue-use-case");
+const GetIssuesUseCase = require("../infrastructure/use-cases/get-issues-use-case");
 
 module.exports = function (app) {
   app
@@ -8,6 +9,9 @@ module.exports = function (app) {
 
     .get(function (req, res) {
       let project = req.params.project;
+      const filters = req.query;
+      const response = new GetIssuesUseCase(project, filters).execute();
+      return res.json(response);
     })
 
     .post(function (req, res) {
