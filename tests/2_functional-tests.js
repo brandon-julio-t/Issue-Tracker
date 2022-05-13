@@ -135,7 +135,6 @@ suite("Functional Tests", function () {
         .get(url)
         .query(filters)
         .end((err, res) => {
-          assert.strictEqual(res.status, 200);
           assert.isArray(res.body);
           assert.strictEqual(res.body.length, 1);
           assert.deepNestedInclude(res.body[0], filters);
@@ -144,24 +143,100 @@ suite("Functional Tests", function () {
   });
 
   suite("PUT", () => {
+    const issueData = {
+      issue_title: "issue_title",
+      issue_text: "issue_text",
+      created_by: "created_by",
+    };
+
     test("Update one field on an issue: PUT request to /api/issues/{project}", () => {
-      //
+      chai
+        .request(server)
+        .post(url)
+        .send(issueData)
+        .end((err, res) => {
+          const issue = res.body;
+          issue.issue_text = "Hello, World!";
+
+          chai
+            .request(server)
+            .put(url)
+            .send(issue)
+            .end((err, res) => {
+              assert.strictEqual(res.status, 200);
+              assert.isObject(res.body);
+              assert.deepNestedInclude(res.body, issue);
+              assert.strictEqual(res.body.issue_text, "Hello, World!");
+            });
+        });
     });
 
     test("Update multiple fields on an issue: PUT request to /api/issues/{project}", () => {
-      //
+      chai
+        .request(server)
+        .post(url)
+        .send(issueData)
+        .end((err, res) => {
+          const issue = res.body;
+          issue.issue_text = "Hello, World!";
+          issue.issue_title = "Hello, World!";
+          issue.created_by = "Hello, World!";
+
+          chai
+            .request(server)
+            .put(url)
+            .send(issue)
+            .end((err, res) => {
+              assert.strictEqual(res.status, 200);
+              assert.isObject(res.body);
+              assert.deepNestedInclude(res.body, issue);
+              assert.strictEqual(res.body.issue_title, "Hello, World!");
+              assert.strictEqual(res.body.issue_text, "Hello, World!");
+              assert.strictEqual(res.body.created_by, "Hello, World!");
+            });
+        });
     });
 
     test("Update an issue with missing _id: PUT request to /api/issues/{project}", () => {
-      //
+      chai
+        .request(server)
+        .put(url)
+        .send({ issue_text: "issue_text" })
+        .end((err, res) => {
+          assert.strictEqual(res.status, 200);
+          assert.isObject(res.body);
+          assert.deepNestedInclude(res.body, { error: "missing _id" });
+        });
     });
 
     test("Update an issue with no fields to update: PUT request to /api/issues/{project}", () => {
-      //
+      chai
+        .request(server)
+        .put(url)
+        .send({ _id: "_id" })
+        .end((err, res) => {
+          assert.strictEqual(res.status, 200);
+          assert.isObject(res.body);
+          assert.deepNestedInclude(res.body, {
+            error: "no update field(s) sent",
+            _id: "_id",
+          });
+        });
     });
 
     test("Update an issue with an invalid _id: PUT request to /api/issues/{project}", () => {
-      //
+      chai
+        .request(server)
+        .put(url)
+        .send({ _id: "_id", issue_title: "issue_title" })
+        .end((err, res) => {
+          assert.strictEqual(res.status, 200);
+          assert.isObject(res.body);
+          assert.deepNestedInclude(res.body, {
+            error: "could not update",
+            _id: "_id",
+          });
+        });
     });
   });
 });
