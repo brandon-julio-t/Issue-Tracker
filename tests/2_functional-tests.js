@@ -101,7 +101,8 @@ suite("Functional Tests", function () {
     test("View issues on a project with one filter: GET request to /api/issues/{project}", () => {
       chai
         .request(server)
-        .get(`${url}?${new URLSearchParams({ issue_title: "title 1" })}`)
+        .get(url)
+        .query({ issue_title: "title 1" })
         .end((err, res) => {
           assert.strictEqual(res.status, 200);
           assert.isArray(res.body);
@@ -111,7 +112,8 @@ suite("Functional Tests", function () {
 
       chai
         .request(server)
-        .get(`${url}?${new URLSearchParams({ created_by: "dummy user" })}`)
+        .get(url)
+        .query({ created_by: "dummy user" })
         .end((err, res) => {
           assert.strictEqual(res.status, 200);
           assert.isArray(res.body);
@@ -130,13 +132,36 @@ suite("Functional Tests", function () {
 
       chai
         .request(server)
-        .get(`${url}?${new URLSearchParams(filters)}`)
+        .get(url)
+        .query(filters)
         .end((err, res) => {
           assert.strictEqual(res.status, 200);
           assert.isArray(res.body);
           assert.strictEqual(res.body.length, 1);
           assert.deepNestedInclude(res.body[0], filters);
         });
+    });
+  });
+
+  suite("PUT", () => {
+    test("Update one field on an issue: PUT request to /api/issues/{project}", () => {
+      //
+    });
+
+    test("Update multiple fields on an issue: PUT request to /api/issues/{project}", () => {
+      //
+    });
+
+    test("Update an issue with missing _id: PUT request to /api/issues/{project}", () => {
+      //
+    });
+
+    test("Update an issue with no fields to update: PUT request to /api/issues/{project}", () => {
+      //
+    });
+
+    test("Update an issue with an invalid _id: PUT request to /api/issues/{project}", () => {
+      //
     });
   });
 });
