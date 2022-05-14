@@ -1,6 +1,7 @@
 "use strict";
 
 const CreateIssueUseCase = require("../infrastructure/use-cases/create-issue-use-case");
+const DeleteIssueUseCase = require("../infrastructure/use-cases/delete-issue-use-case");
 const GetIssuesUseCase = require("../infrastructure/use-cases/get-issues-use-case");
 const UpdateIssueUseCase = require("../infrastructure/use-cases/update-issue-use-case");
 
@@ -32,7 +33,7 @@ module.exports = function (app) {
         const issueData = req.body;
         const response = new UpdateIssueUseCase(project, issueData).execute();
         res.json(response);
-      } catch(error) {
+      } catch (error) {
         const response = { error: error.message };
         if (req.body._id) response._id = req.body._id;
         res.json(response);
@@ -40,6 +41,15 @@ module.exports = function (app) {
     })
 
     .delete(function (req, res) {
-      let project = req.params.project;
+      try {
+        let project = req.params.project;
+        const { _id } = req.body;
+        const response = new DeleteIssueUseCase(project, _id).execute();
+        res.json(response);
+      } catch (error) {
+        const response = { error: error.message };
+        if (req.body._id) response._id = req.body._id;
+        res.json(response);
+      }
     });
 };

@@ -22,9 +22,16 @@ class IssueRepository {
   }
 
   update(issue) {
-    const idx = this.table.findIndex(x => x._id === issue._id);
+    const idx = this.table.findIndex((x) => x._id === issue._id);
     if (idx === -1) return null;
     this.table[idx] = issue;
+    return issue;
+  }
+
+  delete(issue) {
+    const idx = this.table.findIndex((x) => x._id === issue._id);
+    if (idx === -1) return null;
+    this.table.splice(idx, 1);
     return issue;
   }
 }

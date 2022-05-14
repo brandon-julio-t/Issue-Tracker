@@ -22,8 +22,8 @@ class UpdateIssueUseCase {
     Object.assign(issue, this.issueData);
     issue.updated_on = new Date();
 
-    this.issueRepository.update(issue);
-    return { result: "successfully updated", _id: issue._id };
+    const updated = this.issueRepository.update(issue);
+    return { result: "successfully updated", _id: updated._id };
   }
 }
 

@@ -275,4 +275,69 @@ suite("Functional Tests", function () {
         });
     });
   });
+
+  suite("DELETE", () => {
+    const issueData = {
+      issue_title: "issue_title",
+      issue_text: "issue_text",
+      created_by: "created_by",
+    };
+
+    test("Delete an issue: DELETE request to /api/issues/{project}", () => {
+      chai
+        .request(server)
+        .post(url)
+        .send(issueData)
+        .end((err, res) => {
+          const issue = res.body;
+
+          chai
+            .request(server)
+            .delete(url)
+            .send({ _id: issue._id })
+            .end((err, res) => {
+              assert.strictEqual(res.status, 200);
+              assert.deepNestedInclude(res.body, {
+                result: "successfully deleted",
+                _id: issue._id,
+              });
+
+              chai
+                .request(server)
+                .get(url)
+                .query({ _id: issue._id })
+                .end((err, res) => {
+                  assert.strictEqual(res.status, 200);
+                  assert.isArray(res.body);
+                  assert.strictEqual(res.body.length, 0);
+                });
+            });
+        });
+    });
+
+    test("Delete an issue with an invalid _id: DELETE request to /api/issues/{project}", () => {
+      chai
+        .request(server)
+        .delete(url)
+        .send({ _id: "_id" })
+        .end((err, res) => {
+          assert.strictEqual(res.status, 200);
+          assert.deepNestedInclude(res.body, {
+            error: "could not delete",
+            _id: "_id",
+          });
+        });
+    });
+
+    test("Delete an issue with missing _id: DELETE request to /api/issues/{project}", () => {
+      chai
+        .request(server)
+        .delete(url)
+        .send({})
+        .end((err, res) => {
+          assert.strictEqual(res.status, 200);
+          assert.deepNestedInclude(res.body, { error: "missing _id" });
+        });
+    });
+  });
 });
